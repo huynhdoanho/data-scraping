@@ -41,6 +41,7 @@ def insert_one_mongodb(connection, db, collection, data):
     db = connection[db]
     collection = db[collection]
     try:
+        
         collection.insert_one(data)
     except pymongo.errors.DuplicateKeyError:
         print("Duplicate key error: Document with this _id already exists.")
