@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
 import time
+from datetime import datetime, timedelta
 import random
 import uuid
 from classes.utils import url_to_id_short
@@ -14,7 +15,7 @@ class NormalJobScraper:
     """
 
     def __init__(self, url):
-        self.url = url
+        self.url = url.split('?')[0]
         self.soup = None
         self.job = None
 
@@ -147,6 +148,7 @@ class NormalJobScraper:
         
         return {
             '_id': url_to_id_short(self.url),
+            'date': (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d'),
             'url': self.url,
             'company_info': company_info,
             'job_info': job_info,

@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 import pymongo
 
 
-def crawl_urls(max_page):
+def crawl_recent_job_urls(max_page):
     job_detail_urls = []
 
     for page in range(1, max_page+1):
@@ -34,50 +34,48 @@ def crawl_urls(max_page):
 
     return job_detail_urls
 
-crawl_urls(1)
 
+if __name__ == "__main__":
 
-# if __name__ == "__main__":
+    # mongodb config
+    connection = pymongo.MongoClient("mongodb://admin:passwords@localhost:27017/")
+    db = connection["topcv_db"]
+    coll = db['jobs']
 
-#     # mongodb config
-#     connection = pymongo.MongoClient("mongodb://admin:passwords@localhost:27017/")
-#     db = connection["topcv_db"]
-#     coll = db['jobs']
+    # crawl 
+    max_page = 1
+    data = []
+    urls = crawl_recent_job_urls(max_page)
 
-#     # crawl 
-#     max_page = 1
-#     data = []
-#     urls = crawl_urls(max_page)
+    for url in urls:
+        try:    
+            if url[21:29] == 'viec-lam':
+                scraper = NormalJobScraper(url)
+                job_data = scraper.scrape()
+                if job_data: 
+                    data.append(job_data)
+                    coll.insert_one(job_data)
+                    print(f"Inserted job with ID: {job_data['_id']}")
 
-#     for url in urls:
-#         try:    
-#             if url[21:29] == 'viec-lam':
-#                 scraper = NormalJobScraper(url)
-#                 job_data = scraper.scrape()
-#                 if job_data: 
-#                     data.append(job_data)
-#                     coll.insert_one(job_data)
-#                     print(f"Inserted job with ID: {job_data['_id']}")
+            elif url[21:26] == 'brand':
+                # detecting normal brand job or premium brand job
+                response = requests.get(url)
+                soup = BeautifulSoup(response.content, "html.parser")
+                premium = soup.find('div', class_='premium-job')
 
-#             elif url[21:26] == 'brand':
-#                 # detecting normal brand job or premium brand job
-#                 response = requests.get(url)
-#                 soup = BeautifulSoup(response.content, "html.parser")
-#                 premium = soup.find('div', class_='premium-job')
+                if premium:
+                    scraper = PremiumJobScraper(url)
+                else:
+                    scraper = BrandJobScraper(url)
 
-#                 if premium:
-#                     scraper = PremiumJobScraper(url)
-#                 else:
-#                     scraper = BrandJobScraper(url)
+                job_data = scraper.scrape()
 
-#                 job_data = scraper.scrape()
-
-#                 if job_data: 
-#                     data.append(job_data)
-#                     coll.insert_one(job_data)
-#                     print(f"Inserted job with ID: {job_data['_id']}")
+                if job_data: 
+                    data.append(job_data)
+                    coll.insert_one(job_data)
+                    print(f"Inserted job with ID: {job_data['_id']}")
             
-#             time.sleep(2)
-#             print(f"Scraped {len(data)} job postings.")
-#         except Exception as e:
-#             print(f"Error processing URL {url}: {e}")
+            time.sleep(2)
+            print(f"Scraped {len(data)} job postings.")
+        except Exception as e:
+            print(f"Error processing URL {url}: {e}")
