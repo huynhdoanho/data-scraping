@@ -1,3 +1,6 @@
 # mongosh with authentication
 docker exec -it mongodb_container mongosh --username admin --password passwords --authenticationDatabase admin
 
+use topcv_db
+db.jobs.find({})
+db.jobs.count()
