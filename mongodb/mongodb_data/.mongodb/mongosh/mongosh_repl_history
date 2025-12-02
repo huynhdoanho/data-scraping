@@ -1,0 +1,38 @@
+exit
+db.jobs.count()
+use topcv_db
+exit
+db.jobs.find({"date":{}})
+db.jobs.find({"date":})
+db.jobs.find({"date"})
+db.jobs.find({"date":{}})
+db.jobs.find({})
+show dbs
+use topcv_db
+exit
+db.jobs.find({'_id':'Le1gXtxu'})
+db.jobs.find({'id':'Le1gXtxu'})
+use topcv_db
+exit
+db.jobs.find({'_id':'RtKKrwGb'})
+db.jobs.find({})
+db.jobs.find({'_id':'UDO2ANwT'})
+clear
+db.jobs.find({'_id':'UDO2ANwT'})
+db.jobs.find({'_id':'AWddk8KL'})
+db.jobs.find({'_id':'UDO2ANwT'})
+db.jobs.find({})
+use topcv_db
+exit
+db.jobs.count()
+db.jobs.find({})
+db.jobs.deleteMany({})
+db.jobs.find({})
+use topcv_db
+db.jobs.find({})
+db.shows
+exit
+db.jobs.find({})
+show dbs
+shows dbs
+use topcv_db

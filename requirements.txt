@@ -1,0 +1,8 @@
+pymongo==4.4.0
+requests==2.31.0
+beautifulsoup4==4.12.2
+bs4
+python-telegram-bot
+telegram
+load_dotenv
+apache-airflow

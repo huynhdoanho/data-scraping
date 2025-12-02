@@ -1,0 +1,3 @@
+# mongosh with authentication
+docker exec -it mongodb_container mongosh --username admin --password passwords --authenticationDatabase admin
+

@@ -3,8 +3,15 @@ import requests
 import time
 from datetime import datetime, timedelta
 import random
-import uuid
-from classes.utils import url_to_id_short
+import sys
+import os
+
+# ensure repository root is on path so we can import main and classes
+BASE_DIR = os.path.dirname(__file__)
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
+
+from utils import url_to_id_short
 
 
 class NormalJobScraper:

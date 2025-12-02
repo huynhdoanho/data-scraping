@@ -1,0 +1,7 @@
+.vscode
+.DS_Store
+__pycache__/   
+.env
+venv
+mongodb/mongodb_data
+airflow/logs
