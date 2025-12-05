@@ -91,19 +91,20 @@ class BrandJobScraper:
                     # print(f"{label}: {value}")
                     general_info[label] = value
 
-            # jd    
+            # jd        
             else:
                 title = section.find('h2').get_text(strip=True)
-                content_div = section.find('div', class_='content-tab').find_all()
-                content = ""
-                for part in content_div:
-                    if part.name == 'ul':
-                        lis = part.find_all('li')
-                        for li in lis:
-                            content += "- " + li.get_text(strip=True) + "\n"
-                    elif part.name == 'div' or part.name == 'p':
-                        content += part.get_text(strip=True) + "\n"
-                jd[title] = content
+                if section.find('div', class_='content-tab'):
+                    content_div = section.find('div', class_='content-tab').find_all()
+                    content = ""
+                    for part in content_div:
+                        if part.name == 'ul':
+                            lis = part.find_all('li')
+                            for li in lis:
+                                content += "- " + li.get_text(strip=True) + "\n"
+                        elif part.name == 'div' or part.name == 'p':
+                            content += part.get_text(strip=True) + "\n"
+                    jd[title] = content
 
                 # custom form job (job co job khong)
                 cfj = section.find_all('div', class_='custom-form-job__item')

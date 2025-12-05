@@ -16,7 +16,7 @@ from classes.PremiumJobScraper import PremiumJobScraper
 from classes.BrandJobScraper import BrandJobScraper
 
 
-def crawl_recent_job_urls(max_page):
+def crawl_recent_job_urls(max_page, updated_at='1 ngày trước'):
     job_detail_urls = []
 
     for page in range(1, max_page+1):
@@ -31,9 +31,9 @@ def crawl_recent_job_urls(max_page):
             # get updated at
             label = job.find("label", class_="address mobile-hidden label-update")
             # chỉ lấy text trong label, bỏ qua text trong span
-            updated_at = [t for t in label.stripped_strings if t not in label.span.stripped_strings][0]
+            updated_time = [t for t in label.stripped_strings if t not in label.span.stripped_strings][0]
 
-            if updated_at == '1 ngày trước':
+            if updated_time == updated_at:
                 url = job.find('h3', class_='title').find('a')['href']
                 job_detail_urls.append(url)
 
@@ -43,18 +43,36 @@ def crawl_recent_job_urls(max_page):
 
     return job_detail_urls
 
+def crawl_job_urls(max_page):
+    job_detail_urls = []
+
+    for page in range(1, max_page+1):
+        page_url = f"https://www.topcv.vn/tim-viec-lam-cong-nghe-thong-tin-cr257?sort=new&type_keyword=1&page={page}&category_family=r257"
+        response = requests.get(page_url)
+        soup = BeautifulSoup(response.content, "html.parser")
+
+        jobs = soup.find_all('div', attrs={"data-box":"BoxSearchResult"}) # len(jobs)=50, the maximum number of jobs in one single page
+        
+        for job in jobs:    
+            url = job.find('h3', class_='title').find('a')['href']
+            job_detail_urls.append(url)
+
+    return job_detail_urls
+
 
 if __name__ == "__main__":
 
-    # mongodb config
-    connection = pymongo.MongoClient("mongodb://admin:passwords@localhost:27017/")
-    db = connection["topcv_db"]
-    coll = db['jobs']
+    # # mongodb config
+    # connection = pymongo.MongoClient("mongodb://admin:passwords@localhost:27017/")
+    # db = connection["topcv_db"]
+    # coll = db['jobs']
 
     # crawl 
-    max_page = 1
+    max_page = 3
     data = []
-    urls = crawl_recent_job_urls(max_page)
+    # urls = crawl_recent_job_urls(max_page)
+    urls = crawl_job_urls(max_page)
+
 
     for url in urls:
         try:    
@@ -63,7 +81,7 @@ if __name__ == "__main__":
                 job_data = scraper.scrape()
                 if job_data: 
                     data.append(job_data)
-                    coll.insert_one(job_data)
+                    # coll.insert_one(job_data)
                     print(f"Inserted job with ID: {job_data['_id']}")
 
             elif url[21:26] == 'brand':
@@ -81,8 +99,9 @@ if __name__ == "__main__":
 
                 if job_data: 
                     data.append(job_data)
-                    coll.insert_one(job_data)
+                    # coll.insert_one(job_data)
                     print(f"Inserted job with ID: {job_data['_id']}")
+
             
             time.sleep(2)
             print(f"Scraped {len(data)} job postings.")
